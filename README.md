@@ -8,7 +8,8 @@
 
 #### Как использовать данный скрипт?
 
-01. git clone https://github.com/plafonlinux/fedorazero_bash.git
-02. cd fedorazero_bash
-03. chmod +x ./fedora_zero.sh
-04. ./fedora_zero.sh
+01. `git clone https://github.com/plafonlinux/fedorazero_bash.git`
+02. `cd fedorazero_bash`
+03. `chmod +x ./fedora_zero.sh`
+04. `./fedora_zero.sh`
+
