@@ -264,18 +264,14 @@ echo "7) Установить всё"
 read app_choice
 
 if [ "$app_choice" -eq 7 ]; then
-flatpak install --noninteractive -y flathub org.kde.krita org.inkscape.Inkscape org.kde.digikam com.rawtherapee.RawTherapee org.gimp.GIMP org.gnome.gitlab.YaLTeR.Identity
+sudo dnf install wine -y && flatpak install --noninteractive -y flathub com.valvesoftware.Steam com.valvesoftware.Steam.Utility.gamescope net.davidotek.pupgui2 org.freedesktop.Platform.VulkanLayer.MangoHud com.valvesoftware.Steam.Utility.steamtinkerlaunch
 else
 case "$app_choice" in
 1)
 flatpak install --noninteractive -y flathub com.valvesoftware.Steam
 ;;
 2)
-sudo dnf config-manager --add-repo https://dl.winehq.org/wine-builds/fedora/37/winehq.repo -y
-sudo dnf install winehq-devel -y
-wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks -y
-chmod +x winetricks -y
-sudo mv -v winetricks /usr/bin/ -y
+sudo dnf install wine -y
 ;;
 3)
 flatpak install --noninteractive -y flathub com.valvesoftware.Steam.Utility.gamescope
