@@ -4,9 +4,9 @@
 
 ### Как использовать данный скрипт?
 
-#### 01. git clone
+#### 01. git clone https://github.com/plafonlinux/fedorazero_bash.git
 
-#### 02. cd 
+#### 02. cd fedorazero_bash
 
 #### 03. chmod +x ./fedora_zero.sh
 
