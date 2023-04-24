@@ -13,3 +13,8 @@
 03. `chmod +x ./fedora_zero.sh`
 04. `./fedora_zero.sh`
 
+#### Как угостить автора кофе?
+
+Спонсорство на YouTube: https://bit.ly/3MHNzWa 
+
+Заказать рекламу в Телеграме: https://t.me/plafonyoutube | По вопросам рекламы: <a href="https://t.me/Toxblh">Aнтон</a> 
