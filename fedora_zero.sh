@@ -65,24 +65,33 @@ echo "3. Chrome"
 echo ""
 read -p "> " apps
 
-if [ "$apps" == "1" ]; then
+case $apps in
+1)
 sudo dnf install firefox
-else
-echo ""
-fi
-elif [ "$apps" == "2" ]; then
-cd ~/Загрузки/
-wget -O yabro_lastest.rpm https://www.ocenaudio.com/start_download/ocenaudio_fedora35.rpm
-wget -O yabro_lastest.rpm https://download.yandex.ru/downloadable_soft/browser/linux/yandex-browser-downloader.rpm
-sudo dnf install oceanaudio_lastest.rpm
-elif [ "$apps" == "3" ]; then
+;;
+2)
+# Импортируем репозиторий яндекс браузера
+sudo rpm --import https://repo.yandex.ru/yandex-browser/YANDEX-BROWSER-KEY.GPG
+sudo tee /etc/yum.repos.d/yandex-browser.repo <<EOF
+[yandex-browser]
+name=Yandex Browser
+baseurl=https://repo.yandex.ru/yandex-browser/rpm/stable/x86_64/
+enabled=1
+gpgcheck=1
+gpgkey=https://repo.yandex.ru/yandex-browser/YANDEX-BROWSER-KEY.GPG
+EOF
+# Установка яндекс браузера
+sudo dnf install yandex-browser-stable -y
+;;
+3)
 flatpak install --noninteractive -y flathub com.google.Chrome
-fi
-else
+;;
+*)
 echo "Выбран неверный вариант"
+;;
+esac
 fi
 fi
-
 
 # Установка Телеграма
 read -p ">>> Вам нужен Телеграм? (y/n) " choice
@@ -212,7 +221,7 @@ echo "4. Всё сразу!"
 echo ""
 read -p "Введите номер: " choice
 
-# Install the selected program(s)
+# Установка выбранных программ
 case "$choice" in
 1)
 flatpak install --noninteractive -y flathub org.kde.kdenlive
