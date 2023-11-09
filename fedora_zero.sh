@@ -14,7 +14,7 @@ read -p ">>> Давайте добавим необходимые репозит
 echo ""
 if [ "$choice" == "y" ]; then
     read -p ">>> Flathub нужен? (y/n) " choice
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 else
     echo "| Пользоваться системой без ПО? Последний шанс ..."
 fi
@@ -22,7 +22,7 @@ echo ""
 read -p ">>> RPM Fusion нужен? (y/n) " choice
 if [ "$choice" == "y" ]; then
     echo ""
-    sudo dnf install http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 else
     echo ""
     echo "| Вы явно знаете, больше меня ... "
@@ -31,7 +31,7 @@ fi
 #Обновление системы после установки:
 
 echo ""
-read -p ">>> Обновимся для начала? (y/n) " choice
+read -p ">>> Обновимся? (y/n) " choice
 echo ""
 if [ "$choice" == "y" ]; then
     sudo dnf upgrade --refresh --best --allowerasing -y
@@ -75,6 +75,10 @@ if [ "$choice" == "y" ]; then
             echo "Выбран неверный вариант"
             ;;
         esac
+    else
+        echo ""
+        echo "Хорошо, тогда без браузера"
+        echo ""
     fi
 fi
 
@@ -82,10 +86,7 @@ fi
 read -p ">>> Вам нужен Телеграм? (y/n) " choice
 echo ""
 if [ "$choice" == "y" ]; then
-    flatpak install flathub org.telegram.desktop
-    sudo flatpak override --env=XCURSOR_SIZE=12 org.telegram.desktop
-    flatpak --user override --filesystem=/home/$USER/.icons/:ro org.telegram.desktop
-    flatpak --user override --filesystem=/usr/share/icons/:ro org.telegram.desktop
+    flatpak install --noninteractive -y flathub org.telegram.desktop
     echo ""
     echo ">>> Telegram успешно установлен и настроен. Теперь можно заглянуть к нам: https://t.me/plafonyoutube"
 else
@@ -133,12 +134,36 @@ if [ "$answer" == "y" ]; then
 fi
 
 # Установка торрент-клиента
+
 echo ""
-echo "| Такс! Ну, за торрент-клиент я полностью уверен! Позвольте мне эту дерзость!"
+read -p ">>> Давайте поставим торрент клиент? (y/n) " choice
 echo ""
-flatpak install --noninteractive flathub com.transmissionbt.Transmission -y
-echo ""
-echo "| Клиент установлен без спроса! Мы готовы, капитан! Поднять паруса ... -_-"
+if [ "$choice" == "y" ]; then
+    if [ "$answer" == "y" ]; then
+        echo "Выберите торрент клиент для установки:"
+        echo ""
+        echo "1. qBittorrent"
+        echo "2. Fragments"
+        echo "3. Transmission"
+        echo ""
+        read -p "> " apps_torrent
+
+        case $apps_torrent in
+        1)
+            flatpak install --noninteractive -y flathub org.qbittorrent.qBittorrent
+            ;;
+        2)
+            flatpak install --noninteractive -y flathub de.haeckerfelix.Fragments
+            ;;
+        3)
+            flatpak install --noninteractive -y flathub com.transmissionbt.Transmission
+            ;;
+        *)
+            echo "Выбран неверный вариант"
+            ;;
+        esac
+    fi
+fi
 
 # Установка набора для работы с графикой
 echo ""
@@ -185,9 +210,6 @@ if [ "$answer" == "y" ]; then
             ;;
         esac
     fi
-
-else
-    echo "Набор для работы с графикой не требуется"
 fi
 
 # Установка набора для видеомэйкера
@@ -247,97 +269,126 @@ echo ""
 if [ "$answer" == "y" ]; then
     echo "Выберите, что именно вы хотите установить:"
 
-    echo "1) steam"
-    echo "2) wine"
-    echo "3) gamescope"
-    echo "4) protonup"
-    echo "5) mangohud"
-    echo "6) steamthinklauncher"
-    echo "7) Установить всё"
+    echo "1) Steam"
+    echo "2) Wine"
+    echo "3) Gamescope"
+    echo "4) ProtonPlus"
+    echo "5) MangoHud"
+    echo "6) Установить всё"
 
     read app_choice
 
-    if [ "$app_choice" -eq 7 ]; then
-        sudo dnf install wine -y && flatpak install --noninteractive -y flathub com.valvesoftware.Steam com.valvesoftware.Steam.Utility.gamescope net.davidotek.pupgui2 org.freedesktop.Platform.VulkanLayer.MangoHud com.valvesoftware.Steam.Utility.steamtinkerlaunch
+    if [ "$app_choice" -eq 6 ]; then
+        echo "Использовать RPM или Flatpak версию Steam:"
+
+        echo "1) RPM версия"
+        echo "2) Flatpak версия"
+        read all_choice
+        case "$all_choice" in
+        1)
+            sudo dnf install steam wine-core gamescope mangohud -y && flatpak install --noninteractive -y com.vysp3r.ProtonPlus
+            ;;
+        2)
+            sudo dnf install wine-core -y && flatpak install --noninteractive -y flathub com.valvesoftware.Steam com.valvesoftware.Steam.Utility.gamescope com.vysp3r.ProtonPlus org.freedesktop.Platform.VulkanLayer.MangoHud
+            ;;
+        esac
     else
         case "$app_choice" in
         1)
-            flatpak install --noninteractive -y flathub com.valvesoftware.Steam
+            echo "Выберите, какую версию Steam установить:"
+
+            echo "1) RPM версия"
+            echo "2) Flatpak версия"
+            read steam_choice
+            case "$steam_choice" in
+            1)
+                sudo dnf install steam -y
+                ;;
+            2)
+                flatpak install --noninteractive -y flathub com.valvesoftware.Steam && sudo dnf install steam-devices -y
+                ;;
+            esac
             ;;
         2)
-            sudo dnf install wine -y
+            sudo dnf install wine-core -y
             ;;
         3)
             flatpak install --noninteractive -y flathub com.valvesoftware.Steam.Utility.gamescope
             ;;
         4)
-            flatpak install --noninteractive -y flathub net.davidotek.pupgui2
+            flatpak install --noninteractive -y flathub com.vysp3r.ProtonPlus
             ;;
         5)
             flatpak install --noninteractive -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud
-            ;;
-        6)
-            flatpak install --noninteractive -y flathub com.valvesoftware.Steam.Utility.steamtinkerlaunch
             ;;
         *)
             echo "Некорректный выбор"
             ;;
         esac
     fi
+fi
 
-    # Установка библиотеки и читалки для книг
+# Установка библиотеки и читалки для книг
+echo ""
+read -p ">>> Хорошо, книги читаете? (y/n) " choice
+echo ""
+if [ "$choice" == "y" ]; then
+    flatpak install --noninteractive flathub com.calibre_ebook.calibre
+    flatpak install --noninteractive flathub com.github.johnfactotum.Foliate
     echo ""
-    read -p ">>> Хорошо, книги читаете? (y/n) " choice
-    echo ""
-    if [ "$choice" == "y" ]; then
-        flatpak install --noninteractive flathub com.calibre_ebook.calibre
-        flatpak install --noninteractive flathub com.github.johnfactotum.Foliate
-        echo ""
-        echo "| Библиотека готова!"
-    else
-        echo "| Без книг по жизни сложно .. ладно!"
-    fi
+    echo "| Библиотека готова!"
+else
+    echo "| Без книг по жизни сложно .. ладно!"
+fi
 
-    # Установка всякой всячины
+# Установка всякой всячины
+echo ""
+read -p "Хотите установить всякую всячину? (y/n) " response
+echo "Консольные утилиты (fastfetch, inxi, htop), иконки Papirus, Flatseal/Gnome Tweaks/Менеджер расширений и установка кодеков"
+echo ""
+if [[ "$response" =~ ^[Yy]$ ]]; then
     echo ""
-    read -p "Хотите установить всякую всячину? (y/n) " response
-    echo "Консольные утилиты (neofetch, inxi, htop), плагины для Nautilus, иконки Papirus, Flatseal/Gnome Tweaks/Менеджер расширений и установка кодеков"
+    echo "Установка консольных утилит"
     echo ""
-    if [[ "$response" =~ ^[Yy]$ ]]; then
-        echo ""
-        echo "Установка консольных утилит"
-        echo ""
-        sudo dnf install neofetch inxi htop -y
-        echo ""
-        echo "Установка дополнительных плагинов для Nautilus"
-        echo ""
-        sudo dnf install gnome-kra-ora-thumbnailer
-        echo ""
-        echo "Установка иконок Papirus"
-        echo ""
-        sudo dnf install papirus-icon-theme
-        cd /tmp
-        wget -qO- https://git.io/papirus-folders-install | sh
-        papirus-folders -C adwaita --theme Papirus-Dark
-        echo ""
-        echo "Установка Flatseal/Gnome Tweaks/Менеджер расширений"
-        flatpak install --noninteractive -y flathub com.github.tchx84.Flatseal
-        sudo dnf install gnome-tweaks
-        flatpak install --noninteractive -y flathub com.mattjakeman.ExtensionManager
-        echo ""
-        echo "Установка кодеков"
-        echo ""
-        flatpak install --noninteractive -y flathub io.mpv.Mpv
-        sudo dnf install gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel -y
-        sudo dnf install lame\* --exclude=lame-devel -y
-        sudo dnf group upgrade --with-optional Multimedia -y
-        echo ""
-        echo "Со всякой всячиной покончено!"
-        echo ""
-    fi
+    sudo dnf install fastfetch inxi htop -y
+    echo ""
+    echo "Установка иконок Papirus"
+    echo ""
+    sudo dnf install papirus-icon-theme
+    cd /tmp
+    wget -qO- https://git.io/papirus-folders-install | sh
+    papirus-folders -C adwaita --theme Papirus-Dark
+    echo ""
+    echo "Установка Flatseal/Gnome Tweaks/Менеджер расширений"
+    sudo dnf install gnome-tweaks && flatpak install --noninteractive -y flathub com.github.tchx84.Flatseal com.mattjakeman.ExtensionManager
+    echo ""
+    echo "Установка кодеков"
+    echo ""
+    sudo dnf install gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel -y
+    sudo dnf install lame\* --exclude=lame-devel -y
+    sudo dnf group upgrade --with-optional Multimedia -y
+    echo ""
+    echo "Со всякой всячиной покончено!"
+    echo ""
 fi
 
 # Конец установки
+
+#Очистка системы:
+
+echo ""
+read -p ">>> После всех проделынных действий вы хотите очистить систему? (y/n) " choice
+echo ""
+if [ "$choice" == "y" ]; then
+    sudo dnf autoremove
+    sudo dnf clean all
+    flatpak uninstall --unused -y
+    echo ""
+    echo "| Отлично! Система очистилась, теперь можно закончить!"
+else
+    echo "| Очень странное решение, но хозяин-барин!"
+fi
+
 echo "| Не забудь заглянуть к нам: https://t.me/plafonyoutube"
 echo ""
 read -p ">>> Мы закончили? (y/n) " choice
